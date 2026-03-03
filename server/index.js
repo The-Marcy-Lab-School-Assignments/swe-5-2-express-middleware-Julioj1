@@ -18,6 +18,37 @@ const quotes = [
   { id: 10, author: 'Leonardo da Vinci', topic: 'art', text: 'Simplicity is the ultimate sophistication.' },
 ];
 
+const returnQuotes = (req, res) => {
+  const { topic } = req.query;
+  if(topic) {
+    const filtered = quotes.filter(quote => quote.topic === topic);
+    res.json(filtered);
+  } else {
+    res.json(quotes);
+  }
+}
+
+const singleQuote = (req, res) => {
+  const { id } = req.params;
+  const quote = quotes.find(quote => quote.id === Number(id));
+
+  if(!quote) {
+    res.status(404).send('quote not found');
+    return;
+  }
+
+  res.json(quote);
+}
+
+const server404 = (req, res) => {
+  res.status(404).send({ error: `Not found: ${req.originalUrl}` });
+}
+
+// define endpoints, hook them up to controllers
+app.get('/api/quotes', returnQuotes);
+app.get('/api/quotes/:id', singleQuote);
+app.use(server404);
+
 // TODO: Define middleware here
 
 // 1. logRoutes — logs the HTTP method, URL, and timestamp for every request, then calls next()
