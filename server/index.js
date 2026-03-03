@@ -18,7 +18,6 @@ const quotes = [
   { id: 10, author: 'Leonardo da Vinci', topic: 'art', text: 'Simplicity is the ultimate sophistication.' },
 ];
 
-
 // TODO: Define middleware here
 
 // 1. logRoutes — logs the HTTP method, URL, and timestamp for every request, then calls next()
