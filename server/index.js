@@ -48,9 +48,9 @@ const returnQuotes = (req, res) => {
   const { topic } = req.query;
   if(topic) {
     const filtered = quotes.filter(quote => quote.topic === topic);
-    res.json(filtered);
+    return res.json(filtered);
   } else {
-    res.json(quotes);
+    return res.json(quotes);
   }
 }
 
