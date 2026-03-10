@@ -22,34 +22,67 @@ const quotes = [
 
 // 1. logRoutes — logs the HTTP method, URL, and timestamp for every request, then calls next()
 
+const logRoutes = (req, res, next) => {
+  const time = new Date().toLocaleString();
+  console.log(`${req.method}: ${req.originalUrl} - ${time}`);
+  next();
+};
+
 // 2. express.static() — generates middleware that serves files from the frontend/ folder
 //    Use path.join(__dirname, '../frontend') to construct the absolute path
 
+const pathToFrontEnd = path.join(__dirname, '../frontend');
+const serverStatic = express.static(pathToFrontEnd);
+
 // TODO: Register middleware with app.use() before the controllers
 
-
+app.use(logRoutes);
+app.use(serverStatic);
 
 // TODO: Define controllers here
 
 // listQuotes — sends all quotes as JSON
 //   If the request includes a ?topic= query string, send only quotes with a matching topic
 
+const returnQuotes = (req, res) => {
+  const { topic } = req.query;
+  if(topic) {
+    const filtered = quotes.filter(quote => quote.topic === topic);
+    return res.json(filtered);
+  } else {
+    return res.json(quotes);
+  }
+}
+
 // getQuote — sends a single quote whose id matches req.params.id
 //   If no matching quote is found, respond with 404 and { error: 'No quote with id <id>' }
+const singleQuote = (req, res) => {
+  const { id } = req.params;
+  const quote = quotes.find(quote => quote.id === Number(id));
 
+  if(!quote) {
+    res.status(404).send({ error: `No quote with id ${id}` });
+    return;
+  }
 
+  res.json(quote);
+}
 
 // TODO: Register endpoints here
 
 // GET /api/quotes
 // GET /api/quotes/:id
-
+app.get('/api/quotes', returnQuotes);
+app.get('/api/quotes/:id', singleQuote);
 
 
 // TODO: Add a catch-all fallback that responds with 404 and { error: 'Not found: <url>' }
 // Use app.use() and place it after all other routes
+const server404 = (req, res) => {
+  res.status(404).send({ error: `Not found: ${req.originalUrl}` });
+}
 
-
+app.use(server404);
 
 app.listen(port, () => {
   console.log(`Server listening on http://localhost:${port}`);
